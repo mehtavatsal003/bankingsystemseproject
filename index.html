@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Banking System</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">B</span>
+          <div>
+            <strong>Banking System</strong>
+            <span>SRS implementation</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="dashboard">Dashboard</button>
+          <button class="nav-item" data-view="transactions">Transactions</button>
+          <button class="nav-item" data-view="transfer">Transfer</button>
+          <button class="nav-item" data-view="loans">Loans</button>
+          <button class="nav-item" data-view="support">Support</button>
+          <button class="nav-item admin-only" data-view="admin">Admin</button>
+        </nav>
+
+        <div class="session-box">
+          <span id="sessionRole">Guest</span>
+          <strong id="sessionName">Not signed in</strong>
+          <button id="logoutBtn" class="secondary hidden">Log out</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section id="authPanel" class="auth-panel">
+          <div class="auth-copy">
+            <span class="eyebrow">Secure retail banking</span>
+            <h1>Manage accounts, money movement, loans, and service requests.</h1>
+            <p>Use the demo credentials or create a customer account. Data is stored locally in this browser.</p>
+          </div>
+
+          <div class="auth-card">
+            <div class="tabs" role="tablist" aria-label="Authentication">
+              <button class="tab active" data-auth-tab="login">Login</button>
+              <button class="tab" data-auth-tab="register">Register</button>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+              <label>Email <input type="email" id="loginEmail" required value="customer@bank.test"></label>
+              <label>Password <input type="password" id="loginPassword" required value="customer123"></label>
+              <button type="submit" class="primary">Login</button>
+              <p class="hint">Admin: admin@bank.test / admin123</p>
+            </form>
+
+            <form id="registerForm" class="auth-form hidden">
+              <label>Full name <input type="text" id="registerName" required minlength="3"></label>
+              <label>Email <input type="email" id="registerEmail" required></label>
+              <label>Password <input type="password" id="registerPassword" required minlength="6"></label>
+              <button type="submit" class="primary">Create account</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="appPanel" class="hidden">
+          <header class="topbar">
+            <div>
+              <span class="eyebrow" id="viewEyebrow">Customer portal</span>
+              <h2 id="viewTitle">Dashboard</h2>
+            </div>
+            <div class="quick-actions">
+              <button class="secondary" data-view-shortcut="transfer">New transfer</button>
+              <button class="primary" data-view-shortcut="transactions">View statement</button>
+            </div>
+          </header>
+
+          <section class="view active" id="dashboardView">
+            <div class="metrics-grid">
+              <article class="metric">
+                <span>Available balance</span>
+                <strong id="balanceMetric">₹0.00</strong>
+              </article>
+              <article class="metric">
+                <span>Account number</span>
+                <strong id="accountMetric">-</strong>
+              </article>
+              <article class="metric">
+                <span>Account status</span>
+                <strong id="statusMetric">-</strong>
+              </article>
+              <article class="metric">
+                <span>This month activity</span>
+                <strong id="activityMetric">0</strong>
+              </article>
+            </div>
+
+            <div class="split">
+              <section class="panel">
+                <h3>Cash operations</h3>
+                <form id="cashForm" class="inline-form">
+                  <label>Type
+                    <select id="cashType">
+                      <option value="deposit">Deposit</option>
+                      <option value="withdraw">Withdraw</option>
+                    </select>
+                  </label>
+                  <label>Amount <input type="number" id="cashAmount" min="1" step="0.01" required></label>
+                  <button type="submit" class="primary">Submit</button>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Recent transactions</h3>
+                <div id="recentTransactions" class="list"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="transactionsView">
+            <section class="panel">
+              <div class="panel-head">
+                <h3>Account statement</h3>
+                <div class="statement-actions">
+                  <input id="transactionSearch" type="search" placeholder="Search transactions">
+                  <button id="printStatementBtn" class="secondary" type="button">Print</button>
+                </div>
+              </div>
+
+              <div class="statement-meta">
+                <div>
+                  <span>Account holder</span>
+                  <strong id="statementHolder">-</strong>
+                </div>
+                <div>
+                  <span>Account number</span>
+                  <strong id="statementAccount">-</strong>
+                </div>
+                <div>
+                  <span>Generated on</span>
+                  <strong id="statementGenerated">-</strong>
+                </div>
+              </div>
+
+              <form id="statementFilterForm" class="statement-filters">
+                <label>From <input type="date" id="statementFrom"></label>
+                <label>To <input type="date" id="statementTo"></label>
+                <button type="submit" class="primary">View statement</button>
+                <button type="button" id="clearStatementFilter" class="secondary">Clear</button>
+              </form>
+
+              <div class="statement-summary">
+                <article>
+                  <span>Opening balance</span>
+                  <strong id="openingBalance">₹0.00</strong>
+                </article>
+                <article>
+                  <span>Total credits</span>
+                  <strong id="totalCredits">₹0.00</strong>
+                </article>
+                <article>
+                  <span>Total debits</span>
+                  <strong id="totalDebits">₹0.00</strong>
+                </article>
+                <article>
+                  <span>Closing balance</span>
+                  <strong id="closingBalance">₹0.00</strong>
+                </article>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Description</th>
+                      <th class="right">Amount</th>
+                      <th class="right">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactionTable"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <section class="view" id="transferView">
+            <section class="panel narrow">
+              <h3>Transfer funds</h3>
+              <form id="transferForm" class="stacked-form">
+                <label>Beneficiary account <input type="text" id="transferAccount" required placeholder="Example: 100002"></label>
+                <label>Amount <input type="number" id="transferAmount" min="1" step="0.01" required></label>
+                <label>Purpose <input type="text" id="transferPurpose" required placeholder="Rent, fees, family support"></label>
+                <button type="submit" class="primary">Transfer</button>
+              </form>
+            </section>
+          </section>
+
+          <section class="view" id="loansView">
+            <div class="split">
+              <section class="panel">
+                <h3>Request loan</h3>
+                <form id="loanForm" class="stacked-form">
+                  <label>Loan type
+                    <select id="loanType">
+                      <option>Education</option>
+                      <option>Home</option>
+                      <option>Vehicle</option>
+                      <option>Personal</option>
+                    </select>
+                  </label>
+                  <label>Amount <input type="number" id="loanAmount" min="1000" step="100" required></label>
+                  <label>Term in months <input type="number" id="loanTerm" min="6" max="240" required></label>
+                  <button type="submit" class="primary">Submit request</button>
+                </form>
+              </section>
+              <section class="panel">
+                <h3>Loan applications</h3>
+                <div id="loanList" class="list"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="supportView">
+            <div class="split">
+              <section class="panel">
+                <h3>Create service request</h3>
+                <form id="ticketForm" class="stacked-form">
+                  <label>Category
+                    <select id="ticketCategory">
+                      <option>Account access</option>
+                      <option>Transaction dispute</option>
+                      <option>Card service</option>
+                      <option>General inquiry</option>
+                    </select>
+                  </label>
+                  <label>Details <textarea id="ticketDetails" required rows="5"></textarea></label>
+                  <button type="submit" class="primary">Open ticket</button>
+                </form>
+              </section>
+              <section class="panel">
+                <h3>Support tickets</h3>
+                <div id="ticketList" class="list"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="view" id="adminView">
+            <div class="split">
+              <section class="panel">
+                <h3>Customers</h3>
+                <div id="customerList" class="list"></div>
+              </section>
+              <section class="panel">
+                <h3>Pending approvals</h3>
+                <div id="approvalList" class="list"></div>
+              </section>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
